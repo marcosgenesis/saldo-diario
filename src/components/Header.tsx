@@ -1,5 +1,5 @@
+import { ChartNetworkIcon, InboxIcon, SearchIcon } from "lucide-react"
 import { useId } from "react"
-import { HouseIcon, InboxIcon, SearchIcon, ZapIcon } from "lucide-react"
 
 import Logo from "@/components/navbar-components/logo"
 import { Button } from "@/components/ui/button"
@@ -18,9 +18,8 @@ import {
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
-  { href: "#", label: "Home", icon: HouseIcon, active: true },
-  { href: "#", label: "Inbox", icon: InboxIcon },
-  { href: "#", label: "Insights", icon: ZapIcon },
+  { href: "/", label: "Home", icon: InboxIcon, active: true },
+  { href: "/dashboard", label: "Dashboard", icon: ChartNetworkIcon },
 ]
 
 export default function Component() {
