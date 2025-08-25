@@ -45,9 +45,9 @@ interface DailyBalanceColumnsProps {
 
 export function DailyBalanceColumns({ 
   days, 
-  currentPage, 
-  totalPages,
-  onPageChange,
+  // currentPage, 
+  // totalPages,
+  // onPageChange,
   onDeleteExpense,
   onDeleteIncome
 }: DailyBalanceColumnsProps) {
