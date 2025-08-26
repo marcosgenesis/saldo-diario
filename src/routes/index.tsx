@@ -1,9 +1,7 @@
 import { DailyBalanceColumns } from "@/components/daily-balance-columns";
-import { ExpenseForm } from "@/components/expense-form";
 import { FutureProjections } from "@/components/future-projections";
-import { IncomeForm } from "@/components/income-form";
 import { InitialForm } from "@/components/initial-form";
-import { PlusIcon } from "@/components/ui/animated-icons/plus";
+import { RegistryModal } from "@/components/registry-modal";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,13 +70,6 @@ function App() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center py-8">
       <div className="max-w-7xl w-full px-4">
-        <div className="flex justify-between items-center mb-8">
-          {paymentDate && (
-            <Button variant="destructive" size="sm" onClick={handleReset}>
-              Resetar dados
-            </Button>
-          )}
-        </div>
         {!paymentDate ? (
           <div className="max-w-md mx-auto">
             <InitialForm onSubmit={handleInitialFormSubmit} />
@@ -112,46 +103,9 @@ function App() {
                       ).format(remainingBalance)}`}
                     </Badge>
                   </div>
-                  <Button className="z-50">
-                    <PlusIcon />
-                    Nova Despesa
-                  </Button>
+                  <RegistryModal />
                 </div>
               </AuroraBackground>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="p-4 bg-card rounded-lg border">
-                <div className="text-center">
-                  <p className="text-lg font-medium">
-                    Seu saldo diário base é:
-                  </p>
-                  <p className="text-3xl font-bold text-primary">
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(dailyBalance)}
-                  </p>
-                </div>
-                <div className="text-center mt-4">
-                  <p className="text-lg font-medium">Saldo total restante:</p>
-                  <p className="text-2xl font-bold text-secondary">
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(remainingBalance)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 bg-card rounded-lg border">
-                <h2 className="text-xl font-bold mb-4">Registrar Despesa</h2>
-                <ExpenseForm onSubmit={handleExpenseSubmit} />
-              </div>
-
-              <div className="p-4 bg-card rounded-lg border">
-                <h2 className="text-xl font-bold mb-4">Registrar Ganho</h2>
-                <IncomeForm onSubmit={handleIncomeSubmit} />
-              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
