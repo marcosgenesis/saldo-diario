@@ -1,23 +1,26 @@
-import { DailyBalanceColumns } from '@/components/DailyBalanceColumns'
-import { ExpenseForm } from '@/components/ExpenseForm'
-import { FutureProjections } from '@/components/FutureProjections'
-import { IncomeForm } from '@/components/IncomeForm'
-import { InitialForm } from '@/components/InitialForm'
-import { Button } from '@/components/ui/button'
-import { useBalanceStore } from '@/stores/balance'
-import { createFileRoute } from '@tanstack/react-router'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { DailyBalanceColumns } from "@/components/daily-balance-columns";
+import { ExpenseForm } from "@/components/expense-form";
+import { FutureProjections } from "@/components/future-projections";
+import { IncomeForm } from "@/components/income-form";
+import { InitialForm } from "@/components/initial-form";
+import { PlusIcon } from "@/components/ui/animated-icons/plus";
+import { AuroraBackground } from "@/components/ui/aurora-background";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useBalanceStore } from "@/stores/balance";
+import { createFileRoute } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: App,
-})
+});
 
 function App() {
-  const { 
-    setInitialData, 
-    dailyBalance, 
-    remainingBalance, 
-    paymentDate, 
+  const {
+    setInitialData,
+    dailyBalance,
+    remainingBalance,
+    paymentDate,
     addExpense,
     addIncome,
     deleteExpense,
@@ -30,24 +33,39 @@ function App() {
     totalProjectionPages,
     setPage,
     setProjectionPage,
-    reset
-  } = useBalanceStore()
+    reset,
+  } = useBalanceStore();
 
-  const handleInitialFormSubmit = (data: { balance: number; paymentDate: Date }) => {
-    setInitialData(data)
+  const handleInitialFormSubmit = (data: {
+    balance: number;
+    paymentDate: Date;
+  }) => {
+    setInitialData(data);
   };
 
-  const handleExpenseSubmit = (data: { amount: number; description: string; date: Date }) => {
-    addExpense(data)
+  const handleExpenseSubmit = (data: {
+    amount: number;
+    description: string;
+    date: Date;
+  }) => {
+    addExpense(data);
   };
 
-  const handleIncomeSubmit = (data: { amount: number; description: string; date: Date }) => {
-    addIncome(data)
+  const handleIncomeSubmit = (data: {
+    amount: number;
+    description: string;
+    date: Date;
+  }) => {
+    addIncome(data);
   };
 
   const handleReset = () => {
-    if (window.confirm('Tem certeza que deseja resetar todos os dados? Essa ação não pode ser desfeita.')) {
-      reset()
+    if (
+      window.confirm(
+        "Tem certeza que deseja resetar todos os dados? Essa ação não pode ser desfeita."
+      )
+    ) {
+      reset();
     }
   };
 
@@ -55,13 +73,8 @@ function App() {
     <div className="min-h-screen bg-background flex flex-col items-center py-8">
       <div className="max-w-7xl w-full px-4">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Saldo Diário</h1>
           {paymentDate && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleReset}
-            >
+            <Button variant="destructive" size="sm" onClick={handleReset}>
               Resetar dados
             </Button>
           )}
@@ -72,28 +85,64 @@ function App() {
           </div>
         ) : (
           <div className="space-y-8">
+            <div className="border rounded-lg">
+              <AuroraBackground className="rounded-lg">
+                <div className="flex justify-between items-center w-full px-4">
+                  <div className="p-4 flex flex-col gap-2 items-start justify-between w-full">
+                    <span>
+                      <p className="text-muted-foreground">Saldo Diário</p>
+                      <p className="text-3xl font-semibold  tabular-nums text-gray-900">
+                        {new Intl.NumberFormat("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        }).format(dailyBalance)}
+                      </p>
+                    </span>
+                    <Badge variant="outline" className="gap-1.5 bg-white">
+                      <span
+                        className="size-1.5 rounded-full bg-emerald-500"
+                        aria-hidden="true"
+                      ></span>
+                      {`Seu saldo restante até o próximo pagamento é  ${new Intl.NumberFormat(
+                        "pt-BR",
+                        {
+                          style: "currency",
+                          currency: "BRL",
+                        }
+                      ).format(remainingBalance)}`}
+                    </Badge>
+                  </div>
+                  <Button className="z-50">
+                    <PlusIcon />
+                    Nova Despesa
+                  </Button>
+                </div>
+              </AuroraBackground>
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="p-4 bg-card rounded-lg border">
                 <div className="text-center">
-                  <p className="text-lg font-medium">Seu saldo diário base é:</p>
+                  <p className="text-lg font-medium">
+                    Seu saldo diário base é:
+                  </p>
                   <p className="text-3xl font-bold text-primary">
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
                     }).format(dailyBalance)}
                   </p>
                 </div>
                 <div className="text-center mt-4">
                   <p className="text-lg font-medium">Saldo total restante:</p>
                   <p className="text-2xl font-bold text-secondary">
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
                     }).format(remainingBalance)}
                   </p>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-card rounded-lg border">
                 <h2 className="text-xl font-bold mb-4">Registrar Despesa</h2>
                 <ExpenseForm onSubmit={handleExpenseSubmit} />
@@ -119,7 +168,7 @@ function App() {
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </Button>
-                      
+
                       <div className="flex items-center gap-2 px-2">
                         <span className="text-sm text-muted-foreground">
                           {currentPage + 1} de {totalPages}
@@ -137,7 +186,7 @@ function App() {
                     </div>
                   )}
                 </div>
-                <DailyBalanceColumns 
+                <DailyBalanceColumns
                   days={displayedDays}
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -147,7 +196,7 @@ function App() {
                 />
               </div>
 
-              <FutureProjections 
+              <FutureProjections
                 projections={futureProjections}
                 currentPage={currentProjectionPage}
                 totalPages={totalProjectionPages}
