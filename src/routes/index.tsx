@@ -1,6 +1,6 @@
 import { DailyBalanceColumns } from "@/components/daily-balance-columns";
-import { FutureProjections } from "@/components/future-projections";
 import { InitialForm } from "@/components/initial-form";
+import { PeriodSelector } from "@/components/period-selector";
 import { RegistryModal } from "@/components/registry-modal";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Badge } from "@/components/ui/badge";
@@ -108,7 +108,9 @@ function App() {
               </AuroraBackground>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <PeriodSelector />
+
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
               <div>
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold">Histórico de dias</h2>
@@ -150,12 +152,12 @@ function App() {
                 />
               </div>
 
-              <FutureProjections
+              {/* <FutureProjections
                 projections={futureProjections}
                 currentPage={currentProjectionPage}
                 totalPages={totalProjectionPages}
                 onPageChange={setProjectionPage}
-              />
+              /> */}
             </div>
           </div>
         )}

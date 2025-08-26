@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
 import { addDays, format, isSameDay, isToday } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Slot } from "radix-ui";
 import {
@@ -29,6 +30,7 @@ const useMiniCalendar = () => {
   }
   return context;
 };
+
 // Helper function to get array of consecutive dates
 const getDays = (startDate: Date, count: number): Date[] => {
   const days: Date[] = [];
@@ -39,8 +41,12 @@ const getDays = (startDate: Date, count: number): Date[] => {
 };
 // Helper function to format date
 const formatDate = (date: Date) => {
-  const month = format(date, "MMM");
-  const day = format(date, "d");
+  const month = format(date, "MMM", {
+    locale: ptBR,
+  });
+  const day = format(date, "d", {
+    locale: ptBR,
+  });
   return { month, day };
 };
 export type MiniCalendarProps = HTMLAttributes<HTMLDivElement> & {
