@@ -9,11 +9,11 @@ import { useBalanceStore } from "@/stores/balance";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export const Route = createFileRoute("/")({
-  component: App,
+export const Route = createFileRoute("/_authenticated/home")({
+  component: RouteComponent,
 });
 
-function App() {
+function RouteComponent() {
   const {
     setInitialData,
     dailyBalance,
@@ -153,11 +153,11 @@ function App() {
               </div>
 
               {/* <FutureProjections
-                projections={futureProjections}
-                currentPage={currentProjectionPage}
-                totalPages={totalProjectionPages}
-                onPageChange={setProjectionPage}
-              /> */}
+                  projections={futureProjections}
+                  currentPage={currentProjectionPage}
+                  totalPages={totalProjectionPages}
+                  onPageChange={setProjectionPage}
+                /> */}
             </div>
           </div>
         )}
