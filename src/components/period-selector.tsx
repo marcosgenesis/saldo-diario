@@ -7,7 +7,7 @@ import {
 
 export const PeriodSelector = () => {
   return (
-    <MiniCalendar days={22}>
+    <MiniCalendar days={7}>
       <MiniCalendarNavigation direction="prev" />
       <MiniCalendarDays>
         {(date) => <MiniCalendarDay date={date} key={date.toISOString()} />}

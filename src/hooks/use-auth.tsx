@@ -36,6 +36,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (token) {
         setIsAuthenticated(false);
         setIsLoading(false);
+        // navigate({ to: "/login" });
+      } else {
+        setIsAuthenticated(false);
+        setIsLoading(false);
       }
     });
   }, []);
@@ -80,7 +84,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("auth-token");
+    localStorage.removeItem("bearer_token");
+    authClient.signOut();
   };
 
   return (

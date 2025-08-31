@@ -1,6 +1,7 @@
-import Header from "@/components/header";
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-export const Route = createFileRoute("/_authenticated")({
+import { createFileRoute, redirect } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/")({
+  component: RouteComponent,
   beforeLoad: ({ context, location }) => {
     if (!context.auth.isAuthenticated) {
       throw redirect({
@@ -10,12 +11,14 @@ export const Route = createFileRoute("/_authenticated")({
           redirect: location.href,
         },
       });
+    } else {
+      throw redirect({
+        to: "/home",
+      });
     }
   },
-  component: () => (
-    <div>
-      <Header />
-      <Outlet />
-    </div>
-  ),
 });
+
+function RouteComponent() {
+  return <div>Hello "/"!</div>;
+}

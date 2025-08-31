@@ -107,7 +107,6 @@ function RouteComponent() {
                 </div>
               </AuroraBackground>
             </div>
-
             <PeriodSelector />
 
             <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
