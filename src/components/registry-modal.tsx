@@ -40,7 +40,7 @@ export function RegistryModal() {
       <DialogTrigger asChild>
         <Button className="z-50">
           <PlusIcon />
-          Novo Registro
+          <span className="md:block hidden">Novo Registro</span>
         </Button>
       </DialogTrigger>
       <DialogContent>

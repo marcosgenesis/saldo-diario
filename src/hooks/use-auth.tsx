@@ -27,8 +27,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // const navigate = useNavigate();
   // Restore auth state on app load
   useEffect(() => {
-    const token = localStorage.getItem("auth-token");
+    const token = localStorage.getItem("bearer_token");
     authClient.getSession().then((session) => {
+      console.log(session);
       if (session.data?.session) {
         setUser(session.data.user);
         setIsAuthenticated(true);
