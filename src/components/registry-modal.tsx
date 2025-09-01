@@ -8,7 +8,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useBalanceStore } from "@/stores/balance";
 import { FlagIcon } from "lucide-react";
 import { useState } from "react";
 import { ExpenseForm } from "./expense-form";
@@ -16,24 +15,7 @@ import { IncomeForm } from "./income-form";
 import { PlusIcon } from "./ui/animated-icons/plus";
 
 export function RegistryModal() {
-  const [type, setType] = useState<"monthly" | "yearly">("yearly");
-  const { addIncome, addExpense } = useBalanceStore();
-
-  const handleIncomeSubmit = (data: {
-    amount: number;
-    description: string;
-    date: Date;
-  }) => {
-    addIncome(data);
-  };
-
-  const handleExpenseSubmit = (data: {
-    amount: number;
-    description: string;
-    date: Date;
-  }) => {
-    addExpense(data);
-  };
+  const [type, setType] = useState<"income" | "expense">("income");
 
   return (
     <Dialog>
@@ -64,13 +46,13 @@ export function RegistryModal() {
             className="grid-cols-2"
             defaultValue="yearly"
             value={type}
-            onValueChange={(value) => setType(value as "monthly" | "yearly")}
+            onValueChange={(value) => setType(value as "income" | "expense")}
           >
             {/* Monthly */}
             <label className="border-input has-data-[state=checked]:border-primary/50 has-focus-visible:border-ring has-focus-visible:ring-ring/50 relative flex cursor-pointer flex-col gap-1 rounded-md border px-4 py-3 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-[3px]">
               <RadioGroupItem
                 id="radio-monthly"
-                value="monthly"
+                value="income"
                 className="sr-only after:absolute after:inset-0"
               />
               <p className="text-foreground text-sm font-medium">Receita</p>
@@ -82,17 +64,18 @@ export function RegistryModal() {
             <label className="border-input has-data-[state=checked]:border-primary/50 has-focus-visible:border-ring has-focus-visible:ring-ring/50 relative flex cursor-pointer flex-col gap-1 rounded-md border px-4 py-3 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-[3px]">
               <RadioGroupItem
                 id="radio-yearly"
-                value="yearly"
+                value="expense"
                 className="sr-only after:absolute after:inset-0"
               />
               <p className="text-foreground text-sm font-medium">Despesa</p>
               <p className="text-muted-foreground text-sm">Água, Luz, etc.</p>
             </label>
           </RadioGroup>
-          {type === "monthly" ? (
-            <IncomeForm onSubmit={handleIncomeSubmit} />
+
+          {type === "income" ? (
+            <IncomeForm type={type} />
           ) : (
-            <ExpenseForm onSubmit={handleExpenseSubmit} />
+            <ExpenseForm type={type} />
           )}
         </div>
 
