@@ -10,6 +10,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { getDailyBalances } from "@/queries/get-daily-balances";
+import { useBalanceStore } from "@/stores/balance-store";
+import { usePeriodStore } from "@/stores/period-store";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ArrowBigDownIcon, Trash2 } from "lucide-react";
@@ -45,14 +49,26 @@ interface DailyBalanceColumnsProps {
   onDeleteIncome: (id: string) => void;
 }
 
-export function DailyBalanceColumns({
-  days,
-  // currentPage,
-  // totalPages,
-  // onPageChange,
-  onDeleteExpense,
-  onDeleteIncome,
-}: DailyBalanceColumnsProps) {
+export function DailyBalanceColumns() {
+  const { balance } = useBalanceStore();
+  const { period } = usePeriodStore();
+
+  const { data: dailyBalances } = useQuery({
+    queryKey: ["daily-balances", period],
+    queryFn: async () => {
+      if (!period || !balance) return [];
+
+      const response = await getDailyBalances({
+        startDate: period.startDate,
+        endDate: period.endDate,
+        balanceId: balance.id,
+      });
+
+      return response;
+    },
+    enabled: !!period && !!balance,
+  });
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -62,11 +78,8 @@ export function DailyBalanceColumns({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {days.map((day) => (
-        <div
-          key={day.date.toISOString()}
-          className="p-4 bg-card rounded-lg border space-y-4"
-        >
+      {dailyBalances?.map((day) => (
+        <div key={day.id} className="p-4 bg-card rounded-lg border space-y-4">
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-lg font-semibold">

@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
-import { addDays, format, isSameDay, isToday } from "date-fns";
+import {
+  addDays,
+  format,
+  isAfter,
+  isBefore,
+  isSameDay,
+  isToday,
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Slot } from "radix-ui";
@@ -15,12 +22,25 @@ import {
   useContext,
 } from "react";
 // Context for sharing state between components
+type Period = {
+  startDate: Date;
+  endDate: Date;
+};
+
 type MiniCalendarContextType = {
   selectedDate: Date | null | undefined;
   onDateSelect: (date: Date) => void;
   startDate: Date;
   onNavigate: (direction: "prev" | "next") => void;
   days: number;
+  // Range selection
+  selectedPeriod: Period | null;
+  onSelectedPeriodChange: (period: Period) => void;
+  selectionDays: number;
+  // Visible constraint
+  visiblePeriod?: Period;
+  canNavigatePrev: boolean;
+  canNavigateNext: boolean;
 };
 const MiniCalendarContext = createContext<MiniCalendarContextType | null>(null);
 const useMiniCalendar = () => {
@@ -57,6 +77,15 @@ export type MiniCalendarProps = HTMLAttributes<HTMLDivElement> & {
   defaultStartDate?: Date;
   onStartDateChange?: (date: Date | undefined) => void;
   days?: number;
+  // Optional visible window constraint
+  visiblePeriod?: Period;
+  minDate?: Date;
+  maxDate?: Date;
+  // Fixed-length period selection config
+  selectionDays?: number;
+  selectedPeriod?: Period;
+  defaultSelectedPeriod?: Period;
+  onSelectedPeriodChange?: (period: Period | undefined) => void;
 };
 export const MiniCalendar = ({
   value,
@@ -66,6 +95,13 @@ export const MiniCalendar = ({
   defaultStartDate = new Date(),
   onStartDateChange,
   days = 5,
+  visiblePeriod: visiblePeriodProp,
+  minDate,
+  maxDate,
+  selectionDays = 1,
+  selectedPeriod,
+  defaultSelectedPeriod,
+  onSelectedPeriodChange,
   className,
   children,
   ...props
@@ -82,22 +118,78 @@ export const MiniCalendar = ({
     defaultProp: defaultStartDate,
     onChange: onStartDateChange,
   });
+  const [currentSelectedPeriod, setCurrentSelectedPeriod] =
+    useControllableState<Period | undefined>({
+      prop: selectedPeriod,
+      defaultProp: defaultSelectedPeriod,
+      onChange: onSelectedPeriodChange,
+    });
+
+  // Normalize visible period using explicit prop or derived from min/max
+  const visiblePeriod = visiblePeriodProp
+    ? visiblePeriodProp
+    : minDate && maxDate
+      ? { startDate: minDate, endDate: maxDate }
+      : undefined;
+
+  const clampToVisible = (date: Date): Date => {
+    if (!visiblePeriod) return date;
+    if (isBefore(date, visiblePeriod.startDate)) return visiblePeriod.startDate;
+    if (isAfter(date, visiblePeriod.endDate)) return visiblePeriod.endDate;
+    return date;
+  };
+
+  const clampStartForWindow = (date: Date): Date => {
+    if (!visiblePeriod) return date;
+    // Ensure the window [date, date + days - 1] stays within visiblePeriod
+    const maxStart = addDays(visiblePeriod.endDate, -(days - 1));
+    if (isBefore(date, visiblePeriod.startDate)) return visiblePeriod.startDate;
+    if (isAfter(date, maxStart)) return maxStart;
+    return date;
+  };
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
+    // If selectionDays > 1, also set a period selection
+    const start = clampToVisible(date);
+    const unclampedEnd = addDays(start, Math.max(1, selectionDays) - 1);
+    const end = clampToVisible(unclampedEnd);
+    const period: Period = { startDate: start, endDate: end };
+    setCurrentSelectedPeriod(period);
   };
   const handleNavigate = (direction: "prev" | "next") => {
     const newStartDate = addDays(
       currentStartDate || new Date(),
       direction === "next" ? days : -days
     );
-    setCurrentStartDate(newStartDate);
+    setCurrentStartDate(clampStartForWindow(newStartDate));
   };
+  // Evaluate navigation availability within visiblePeriod window
+  const effectiveStartDate = clampStartForWindow(
+    currentStartDate || new Date()
+  );
+  const maxStartForWindow = visiblePeriod
+    ? addDays(visiblePeriod.endDate, -(days - 1))
+    : undefined;
+  const canNavigatePrev = visiblePeriod
+    ? isAfter(effectiveStartDate, visiblePeriod.startDate)
+    : true;
+  const canNavigateNext = visiblePeriod
+    ? maxStartForWindow
+      ? isBefore(effectiveStartDate, maxStartForWindow)
+      : false
+    : true;
   const contextValue: MiniCalendarContextType = {
     selectedDate: selectedDate || null,
     onDateSelect: handleDateSelect,
-    startDate: currentStartDate || new Date(),
+    startDate: clampStartForWindow(currentStartDate || new Date()),
     onNavigate: handleNavigate,
     days,
+    selectedPeriod: currentSelectedPeriod || null,
+    onSelectedPeriodChange: (p) => setCurrentSelectedPeriod(p),
+    selectionDays,
+    visiblePeriod,
+    canNavigatePrev,
+    canNavigateNext,
   };
   return (
     <MiniCalendarContext.Provider value={contextValue}>
@@ -125,15 +217,19 @@ export const MiniCalendarNavigation = ({
   onClick,
   ...props
 }: MiniCalendarNavigationProps) => {
-  const { onNavigate } = useMiniCalendar();
+  const { onNavigate, canNavigatePrev, canNavigateNext } = useMiniCalendar();
   const Icon = direction === "prev" ? ChevronLeftIcon : ChevronRightIcon;
   const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+    const isDisabled =
+      direction === "prev" ? !canNavigatePrev : !canNavigateNext;
+    if (isDisabled) return;
     onNavigate(direction);
     onClick?.(event);
   };
+  const disabled = direction === "prev" ? !canNavigatePrev : !canNavigateNext;
   if (asChild) {
     return (
-      <Slot.Root onClick={handleClick} {...props}>
+      <Slot.Root onClick={handleClick} aria-disabled={disabled} {...props}>
         {children}
       </Slot.Root>
     );
@@ -144,6 +240,7 @@ export const MiniCalendarNavigation = ({
       size={asChild ? undefined : "icon"}
       type="button"
       variant={asChild ? undefined : "ghost"}
+      disabled={disabled}
       {...props}
     >
       {children ?? <Icon className="size-4" />}
@@ -161,8 +258,15 @@ export const MiniCalendarDays = ({
   children,
   ...props
 }: MiniCalendarDaysProps) => {
-  const { startDate, days: dayCount } = useMiniCalendar();
-  const days = getDays(startDate, dayCount);
+  const { startDate, days: dayCount, visiblePeriod } = useMiniCalendar();
+  let days = getDays(startDate, dayCount);
+  if (visiblePeriod) {
+    days = days.filter(
+      (d) =>
+        !isBefore(d, visiblePeriod.startDate) &&
+        !isAfter(d, visiblePeriod.endDate)
+    );
+  }
   return (
     <div
       className={cn("flex items-center gap-1 justify-around w-full", className)}
@@ -181,27 +285,31 @@ export const MiniCalendarDay = ({
   className,
   ...props
 }: MiniCalendarDayProps) => {
-  const { selectedDate, onDateSelect } = useMiniCalendar();
+  const { selectedDate, onDateSelect, selectedPeriod } = useMiniCalendar();
   const { month, day } = formatDate(date);
   const isSelected = selectedDate && isSameDay(date, selectedDate);
+  const isInSelectedPeriod =
+    selectedPeriod &&
+    !isBefore(date, selectedPeriod.startDate) &&
+    !isAfter(date, selectedPeriod.endDate);
   const isTodayDate = isToday(date);
   return (
     <Button
       className={cn(
         "h-auto w-full min-w-[3rem] flex-col gap-0 p-2 text-xs",
-        isTodayDate && !isSelected && "bg-accent",
+        isTodayDate && !isSelected && !isInSelectedPeriod && "bg-accent",
         className
       )}
       onClick={() => onDateSelect(date)}
       size="sm"
       type="button"
-      variant={isSelected ? "default" : "ghost"}
+      variant={isSelected || isInSelectedPeriod ? "default" : "ghost"}
       {...props}
     >
       <span
         className={cn(
           "font-medium text-[10px] text-muted-foreground",
-          isSelected && "text-primary-foreground/70"
+          (isSelected || isInSelectedPeriod) && "text-primary-foreground/70"
         )}
       >
         {month}

@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getLastBalances } from "@/queries/get-last-balances";
 import { useBalanceStore } from "@/stores/balance";
+import { useBalanceStore as useBalanceStoreStore } from "@/stores/balance-store";
+import { usePeriodStore } from "@/stores/period-store";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { endOfYear, startOfYear } from "date-fns";
@@ -18,65 +20,31 @@ export const Route = createFileRoute("/_authenticated/home")({
 
 function RouteComponent() {
   const {
-    setInitialData,
     dailyBalance,
     remainingBalance,
-    paymentDate,
-    addExpense,
-    addIncome,
     deleteExpense,
     deleteIncome,
     displayedDays,
-    futureProjections,
     currentPage,
     totalPages,
-    currentProjectionPage,
-    totalProjectionPages,
     setPage,
-    setProjectionPage,
-    reset,
   } = useBalanceStore();
 
-  const handleInitialFormSubmit = (data: {
-    balance: number;
-    paymentDate: Date;
-  }) => {
-    setInitialData(data);
-  };
-
-  const handleExpenseSubmit = (data: {
-    amount: number;
-    description: string;
-    date: Date;
-  }) => {
-    addExpense(data);
-  };
-
-  const handleIncomeSubmit = (data: {
-    amount: number;
-    description: string;
-    date: Date;
-  }) => {
-    addIncome(data);
-  };
-
-  const handleReset = () => {
-    if (
-      window.confirm(
-        "Tem certeza que deseja resetar todos os dados? Essa ação não pode ser desfeita."
-      )
-    ) {
-      reset();
-    }
-  };
+  const { balance, setBalance } = useBalanceStoreStore();
+  const { period } = usePeriodStore();
 
   const { data: lastBalances } = useQuery({
     queryKey: ["last-balances"],
-    queryFn: async () =>
-      getLastBalances({
+    queryFn: async () => {
+      const response = await getLastBalances({
         startDate: startOfYear(new Date()),
         endDate: endOfYear(new Date()),
-      }),
+      });
+      if (response?.length) {
+        setBalance(response[0]);
+      }
+      return response;
+    },
   });
 
   if (!lastBalances?.length) {

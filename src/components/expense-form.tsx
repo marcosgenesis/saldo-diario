@@ -3,6 +3,7 @@ import {
   createTransaction,
   createTransactionSchema,
 } from "@/mutations/create-transaction";
+import { useBalanceStore } from "@/stores/balance-store";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -22,7 +23,9 @@ const formSchema = createTransactionSchema.omit({
   balanceId: true,
   type: true,
 });
+
 export function ExpenseForm({ type }: ExpenseFormProps) {
+  const { balance } = useBalanceStore();
   const { mutate: createTransactionMutation } = useMutation({
     mutationFn: createTransaction,
     onSuccess: () => {
@@ -46,7 +49,7 @@ export function ExpenseForm({ type }: ExpenseFormProps) {
       createTransactionMutation({
         ...value,
         type,
-        balanceId: "mCgpUwD0zOdQWdxse645wM0ZY5YtGMDl",
+        balanceId: balance?.id as string,
       });
     },
   });
