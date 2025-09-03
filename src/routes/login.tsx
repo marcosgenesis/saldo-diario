@@ -25,10 +25,10 @@ export const Route = createFileRoute("/login")({
       throw redirect({ to: search.redirect });
     }
   },
-  component: LoginComponent,
+  component: RegisterComponent,
 });
 
-function LoginComponent() {
+function RegisterComponent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
