@@ -11,22 +11,33 @@ export const createTransactionSchema = z.object({
 
 export type CreateTransactionSchema = z.infer<typeof createTransactionSchema>;
 
-export const createTransaction = async (transaction: CreateTransactionSchema) => {
-  if(transaction.type === "income"){
-    const response = await api.post<SuccessResponse<CreateTransactionSchema>>("api/income", {
-      json: {
-        ...transaction,
-        date: new Date(transaction.date).toUTCString(),
-      },
-    }).json();
-    return response.data;
-  }else{
-    const response = await api.post<SuccessResponse<CreateTransactionSchema>>("api/expense", {
-      json: {
-        ...transaction,
-        date: new Date(transaction.date).toUTCString(),
-      },
-    }).json();
-    return response.data;
+export const createTransaction = async (
+  transaction: CreateTransactionSchema
+) => {
+  try {
+    if (transaction.type === "income") {
+      const response = await api
+        .post<SuccessResponse<CreateTransactionSchema>>("api/income", {
+          json: {
+            ...transaction,
+            date: new Date(transaction.date).toUTCString(),
+          },
+        })
+        .json();
+      return response.data;
+    } else {
+      const response = await api
+        .post<SuccessResponse<CreateTransactionSchema>>("api/expense", {
+          json: {
+            ...transaction,
+            date: new Date(transaction.date).toUTCString(),
+          },
+        })
+        .json();
+      return response.data;
+    }
+  } catch (error) {
+    console.log({ error });
+    throw new Error("Erro ao criar transação");
   }
-}
+};

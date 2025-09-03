@@ -9,15 +9,20 @@ import {
 
 export const PeriodSelector = () => {
   const { balance } = useBalanceStore();
-  const { setPeriod } = usePeriodStore();
+  const { setPeriod, period } = usePeriodStore();
 
   return (
     <MiniCalendar
       days={5}
       selectionDays={3}
-      minDate={balance?.startDate}
-      maxDate={balance?.endDate}
+      minDate={balance?.startDate ? new Date(balance.startDate) : undefined}
+      maxDate={balance?.endDate ? new Date(balance.endDate) : undefined}
+      defaultValue={
+        period?.startDate ? (new Date(period.startDate) as any) : undefined
+      }
+      defaultSelectedPeriod={period ?? undefined}
       onSelectedPeriodChange={(period) => {
+        console.log({ period });
         if (period) setPeriod(period);
       }}
     >

@@ -136,7 +136,7 @@ export const MiniCalendar = ({
     if (!visiblePeriod) return date;
     if (isBefore(date, visiblePeriod.startDate)) return visiblePeriod.startDate;
     if (isAfter(date, visiblePeriod.endDate)) return visiblePeriod.endDate;
-    return date;
+    return new Date(date);
   };
 
   const clampStartForWindow = (date: Date): Date => {
@@ -153,7 +153,7 @@ export const MiniCalendar = ({
     const start = clampToVisible(date);
     const unclampedEnd = addDays(start, Math.max(1, selectionDays) - 1);
     const end = clampToVisible(unclampedEnd);
-    const period: Period = { startDate: start, endDate: end };
+    const period: Period = { startDate: start, endDate: unclampedEnd };
     setCurrentSelectedPeriod(period);
   };
   const handleNavigate = (direction: "prev" | "next") => {

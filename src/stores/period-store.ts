@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { create } from "zustand";
 
 type Period = {
@@ -11,6 +12,9 @@ interface PeriodStore {
 }
 
 export const usePeriodStore = create<PeriodStore>((set) => ({
-  period: null,
+  period: {
+    startDate: new Date(),
+    endDate: addDays(new Date(), 3),
+  },
   setPeriod: (period: Period) => set({ period }),
 }));

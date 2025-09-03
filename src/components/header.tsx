@@ -1,4 +1,4 @@
-import { HouseIcon, InboxIcon, SparklesIcon, ZapIcon } from "lucide-react";
+import { HouseIcon, InboxIcon } from "lucide-react";
 
 import Logo from "@/components/navbar-components/logo";
 import UserMenu from "@/components/navbar-components/user-menu";
@@ -18,8 +18,8 @@ import {
 // Navigation links array
 const navigationLinks = [
   { href: "#", label: "Home", icon: HouseIcon, active: true },
-  { href: "#", label: "Inbox", icon: InboxIcon },
-  { href: "#", label: "Insights", icon: ZapIcon },
+  { href: "#", label: "Histórico completo", icon: InboxIcon },
+  // { href: "#", label: "Insights", icon: ZapIcon },
 ];
 
 export default function Header() {
@@ -127,14 +127,14 @@ export default function Header() {
           {/* User menu */}
           <UserMenu />
           {/* Upgrade button */}
-          <Button size="sm" className="text-sm sm:aspect-square">
+          {/* <Button size="sm" className="text-sm sm:aspect-square">
             <SparklesIcon
               className="opacity-60 sm:-ms-1"
               size={16}
               aria-hidden="true"
             />
             <span className="sm:sr-only">Upgrade</span>
-          </Button>
+          </Button> */}
         </div>
       </div>
     </header>

@@ -3,6 +3,7 @@ import {
   createTransaction,
   createTransactionSchema,
 } from "@/mutations/create-transaction";
+import { useBalanceStore } from "@/stores/balance-store";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -17,8 +18,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 interface IncomeFormProps {
   type: "income" | "expense";
 }
+const formSchema = createTransactionSchema.omit({
+  balanceId: true,
+  type: true,
+});
 
 export function IncomeForm({ type }: IncomeFormProps) {
+  const { balance } = useBalanceStore();
   const { mutate: createTransactionMutation } = useMutation({
     mutationFn: createTransaction,
   });
@@ -30,13 +36,17 @@ export function IncomeForm({ type }: IncomeFormProps) {
       date: new Date(),
     },
     validators: {
-      onChange: createTransactionSchema,
+      onChange: formSchema,
     },
     onSubmit: ({ value }) => {
-      createTransactionMutation({ ...value, type });
+      createTransactionMutation({
+        ...value,
+        type,
+        balanceId: balance?.id as string,
+      });
     },
   });
-
+  console.log(form.state.errors);
   return (
     <form
       onSubmit={(e) => {
@@ -112,7 +122,14 @@ export function IncomeForm({ type }: IncomeFormProps) {
         )}
       />
 
-      <Button type="submit" className="w-full" variant="default">
+      <Button
+        type="submit"
+        className="w-full"
+        variant="default"
+        onClick={() => {
+          form.handleSubmit();
+        }}
+      >
         Registrar ganho
       </Button>
     </form>

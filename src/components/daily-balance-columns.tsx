@@ -57,6 +57,7 @@ export function DailyBalanceColumns() {
     queryKey: ["daily-balances", period],
     queryFn: async () => {
       if (!period || !balance) return [];
+      console.log({ startDate: period.startDate, endDate: period.endDate });
 
       const response = await getDailyBalances({
         startDate: period.startDate,

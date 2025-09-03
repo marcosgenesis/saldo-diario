@@ -4,34 +4,18 @@ import { PeriodSelector } from "@/components/period-selector";
 import { RegistryModal } from "@/components/registry-modal";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { getLastBalances } from "@/queries/get-last-balances";
-import { useBalanceStore } from "@/stores/balance";
 import { useBalanceStore as useBalanceStoreStore } from "@/stores/balance-store";
-import { usePeriodStore } from "@/stores/period-store";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { endOfYear, startOfYear } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const {
-    dailyBalance,
-    remainingBalance,
-    deleteExpense,
-    deleteIncome,
-    displayedDays,
-    currentPage,
-    totalPages,
-    setPage,
-  } = useBalanceStore();
-
   const { balance, setBalance } = useBalanceStoreStore();
-  const { period } = usePeriodStore();
 
   const { data: lastBalances } = useQuery({
     queryKey: ["last-balances"],
@@ -73,7 +57,7 @@ function RouteComponent() {
                       {new Intl.NumberFormat("pt-BR", {
                         style: "currency",
                         currency: "BRL",
-                      }).format(dailyBalance)}
+                      }).format(balance?.dailyBalanceToday ?? 0)}
                     </p>
                   </span>
                   <Badge variant="outline" className="gap-1.5 bg-white">
@@ -87,7 +71,7 @@ function RouteComponent() {
                         style: "currency",
                         currency: "BRL",
                       }
-                    ).format(remainingBalance)}`}
+                    ).format(balance?.totalRemainingUntilToday ?? 0)}`}
                   </Badge>
                 </div>
                 <RegistryModal />
@@ -100,42 +84,8 @@ function RouteComponent() {
             <div>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Histórico de dias</h2>
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setPage(currentPage - 1)}
-                      disabled={currentPage === 0}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-
-                    <div className="flex items-center gap-2 px-2">
-                      <span className="text-sm text-muted-foreground">
-                        {currentPage + 1} de {totalPages}
-                      </span>
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setPage(currentPage + 1)}
-                      disabled={currentPage === totalPages - 1}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
               </div>
-              <DailyBalanceColumns
-                days={displayedDays}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setPage}
-                onDeleteExpense={deleteExpense}
-                onDeleteIncome={deleteIncome}
-              />
+              <DailyBalanceColumns />
             </div>
 
             {/* <FutureProjections

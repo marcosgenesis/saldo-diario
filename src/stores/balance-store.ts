@@ -1,10 +1,12 @@
 import { create } from "zustand";
 
-type Balance = {
+export type Balance = {
   id: string;
   amount: number;
   startDate: Date;
   endDate: Date;
+  dailyBalanceToday?: number;
+  totalRemainingUntilToday?: number;
 };
 
 interface BalanceStore {
@@ -15,5 +17,4 @@ interface BalanceStore {
 export const useBalanceStore = create<BalanceStore>((set) => ({
   balance: null,
   setBalance: (balance: Balance) => set({ balance }),
-
 }));
