@@ -9,7 +9,7 @@ export interface SuccessResponse<T = any> {
 }
 
 export const api = ky.create({
-  prefixUrl: import.meta.env.API_URL,
+  prefixUrl: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
