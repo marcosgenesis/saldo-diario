@@ -1,4 +1,4 @@
-import ky from 'ky';
+import ky from "ky";
 
 export interface SuccessResponse<T = any> {
   success: true;
@@ -9,11 +9,11 @@ export interface SuccessResponse<T = any> {
 }
 
 export const api = ky.create({
-  prefixUrl: 'http://localhost:4000',
+  prefixUrl: import.meta.env.API_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('bearer_token')}`,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${localStorage.getItem("bearer_token")}`,
   },
-})
+});
