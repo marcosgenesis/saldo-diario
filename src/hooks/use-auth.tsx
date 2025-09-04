@@ -1,3 +1,4 @@
+import { router } from "@/router";
 import { authClient } from "@/services/auth-client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -24,7 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  // const navigate = useNavigate();
   // Restore auth state on app load
   useEffect(() => {
     const token = localStorage.getItem("bearer_token");
@@ -37,7 +37,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (token) {
         setIsAuthenticated(false);
         setIsLoading(false);
-        // navigate({ to: "/login" });
       } else {
         setIsAuthenticated(false);
         setIsLoading(false);
@@ -61,10 +60,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
       },
       {
-        onRequest: (ctx) => {
+        onRequest: (_ctx) => {
           setIsLoading(true);
         },
-        onResponse: (ctx) => {
+        onResponse: (_ctx) => {
           setIsLoading(false);
         },
         onSuccess: (ctx) => {
@@ -72,11 +71,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Store the token securely (e.g., in localStorage)
           localStorage.setItem("bearer_token", authToken as string);
           setIsAuthenticated(true);
-          console.log(ctx.data);
-          // setUser(ctx.data);
-          // navigate({
-          //   to: "/home",
-          // });
+          setUser(ctx.data.user);
+          router.navigate({ to: "/home" });
         },
       }
     );

@@ -11,9 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -60,7 +62,15 @@ export default function UserMenu() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator /> */}
-        <DropdownMenuItem onClick={() => logout()}>
+        <DropdownMenuItem
+          onClick={() => {
+            logout();
+            navigate({
+              to: "/login",
+              search: { redirect: window.location.pathname },
+            });
+          }}
+        >
           <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
           <span>Sair</span>
         </DropdownMenuItem>
