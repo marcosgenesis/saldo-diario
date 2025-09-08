@@ -1,3 +1,4 @@
+import { getUserTimezone, toISOStringInTimezone } from "@/lib/date-utils";
 import { api, type SuccessResponse } from "@/services/api";
 interface Expense {
   id: string;
@@ -31,11 +32,13 @@ export const getDailyBalances = async ({
   endDate: Date;
   balanceId: string;
 }) => {
+  const userTimezone = getUserTimezone();
+
   const response = await api
     .get<SuccessResponse<DailyBalance[]>>("api/balance/daily/period", {
       searchParams: {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: toISOStringInTimezone(startDate, userTimezone),
+        endDate: toISOStringInTimezone(endDate, userTimezone),
         balanceId: balanceId,
       },
     })

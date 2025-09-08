@@ -4,34 +4,37 @@ import { PeriodSelector } from "@/components/period-selector";
 import { RegistryModal } from "@/components/registry-modal";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Badge } from "@/components/ui/badge";
-import { getLastBalances } from "@/queries/get-last-balances";
+import { fromUTC, getUserTimezone } from "@/lib/date-utils";
+import { getTodayBalance } from "@/queries/get-today-balance";
 import { useBalanceStore as useBalanceStoreStore } from "@/stores/balance-store";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { endOfYear, startOfYear } from "date-fns";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: RouteComponent,
+  beforeLoad: async () => {
+    const userTimezone = getUserTimezone();
+    const response = await getTodayBalance();
+    if (response) {
+      const balance = {
+        ...response,
+        startDate: fromUTC(response.startDate, userTimezone),
+        endDate: fromUTC(response.endDate, userTimezone),
+        createdAt: fromUTC(response.createdAt, userTimezone),
+      };
+      useBalanceStoreStore.setState({
+        balance: balance,
+      });
+    }
+    return {
+      initialBalance: response,
+    };
+  },
 });
 
 function RouteComponent() {
-  const { balance, setBalance } = useBalanceStoreStore();
+  const { balance } = useBalanceStoreStore();
 
-  const { data: lastBalances } = useQuery({
-    queryKey: ["last-balances"],
-    queryFn: async () => {
-      const response = await getLastBalances({
-        startDate: startOfYear(new Date()),
-        endDate: endOfYear(new Date()),
-      });
-      if (response?.length) {
-        setBalance(response[0]);
-      }
-      return response;
-    },
-  });
-
-  if (!lastBalances?.length) {
+  if (!balance) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center py-8">
         <div className="max-w-7xl w-full px-4">

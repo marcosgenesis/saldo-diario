@@ -1,3 +1,4 @@
+import { registryModalStore } from "@/hooks/use-registry-modal";
 import { cn } from "@/lib/utils";
 import {
   createTransaction,
@@ -5,7 +6,7 @@ import {
 } from "@/mutations/create-transaction";
 import { useBalanceStore } from "@/stores/balance-store";
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -25,14 +26,20 @@ const formSchema = createTransactionSchema.omit({
 });
 
 export function ExpenseForm({ type }: ExpenseFormProps) {
+  const { setIsOpen } = registryModalStore();
+  const queryClient = useQueryClient();
   const { balance } = useBalanceStore();
   const { mutate: createTransactionMutation } = useMutation({
     mutationFn: createTransaction,
     onSuccess: () => {
       toast.success("Transação criada com sucesso");
+      queryClient.invalidateQueries({ queryKey: ["last-balances"] });
+      setIsOpen(false);
     },
     onError: () => {
       toast.error("Erro ao criar transação");
+      queryClient.invalidateQueries({ queryKey: ["last-balances"] });
+      setIsOpen(false);
     },
   });
 

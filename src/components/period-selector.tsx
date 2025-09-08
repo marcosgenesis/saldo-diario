@@ -1,3 +1,4 @@
+import { fromUTC, getUserTimezone } from "@/lib/date-utils";
 import { useBalanceStore } from "@/stores/balance-store";
 import { usePeriodStore } from "@/stores/period-store";
 import {
@@ -10,15 +11,25 @@ import {
 export const PeriodSelector = () => {
   const { balance } = useBalanceStore();
   const { setPeriod, period } = usePeriodStore();
+  const userTimezone = getUserTimezone();
+
+  const minDate = balance?.startDate
+    ? fromUTC(balance.startDate, userTimezone)
+    : undefined;
+  const maxDate = balance?.endDate
+    ? fromUTC(balance.endDate, userTimezone)
+    : undefined;
 
   return (
     <MiniCalendar
       days={5}
       selectionDays={3}
-      minDate={balance?.startDate ? new Date(balance.startDate) : undefined}
-      maxDate={balance?.endDate ? new Date(balance.endDate) : undefined}
+      minDate={minDate}
+      maxDate={maxDate}
       defaultValue={
-        period?.startDate ? (new Date(period.startDate) as any) : undefined
+        period?.startDate
+          ? (fromUTC(period.startDate, userTimezone) as any)
+          : undefined
       }
       defaultSelectedPeriod={period ?? undefined}
       onSelectedPeriodChange={(period) => {

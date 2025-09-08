@@ -8,17 +8,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { registryModalStore } from "@/hooks/use-registry-modal";
 import { FlagIcon } from "lucide-react";
-import { useState } from "react";
 import { ExpenseForm } from "./expense-form";
 import { IncomeForm } from "./income-form";
 import { PlusIcon } from "./ui/animated-icons/plus";
 
 export function RegistryModal() {
-  const [type, setType] = useState<"income" | "expense">("income");
+  const { type, setType, isOpen, setIsOpen } = registryModalStore();
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="z-50">
           <PlusIcon />

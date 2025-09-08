@@ -1,3 +1,4 @@
+import { getUserTimezone, toISOStringInTimezone } from "@/lib/date-utils";
 import { api, type SuccessResponse } from "@/services/api";
 import z from "zod";
 
@@ -15,23 +16,23 @@ export const createTransaction = async (
   transaction: CreateTransactionSchema
 ) => {
   try {
+    const userTimezone = getUserTimezone();
+    const transactionData = {
+      ...transaction,
+      date: toISOStringInTimezone(transaction.date, userTimezone),
+    };
+
     if (transaction.type === "income") {
       const response = await api
         .post<SuccessResponse<CreateTransactionSchema>>("api/income", {
-          json: {
-            ...transaction,
-            date: new Date(transaction.date).toUTCString(),
-          },
+          json: transactionData,
         })
         .json();
       return response.data;
     } else {
       const response = await api
         .post<SuccessResponse<CreateTransactionSchema>>("api/expense", {
-          json: {
-            ...transaction,
-            date: new Date(transaction.date).toUTCString(),
-          },
+          json: transactionData,
         })
         .json();
       return response.data;

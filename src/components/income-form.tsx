@@ -1,3 +1,4 @@
+import { registryModalStore } from "@/hooks/use-registry-modal";
 import { cn } from "@/lib/utils";
 import {
   createTransaction,
@@ -5,10 +6,11 @@ import {
 } from "@/mutations/create-transaction";
 import { useBalanceStore } from "@/stores/balance-store";
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import { Input } from "./ui/input";
@@ -24,9 +26,21 @@ const formSchema = createTransactionSchema.omit({
 });
 
 export function IncomeForm({ type }: IncomeFormProps) {
+  const { setIsOpen } = registryModalStore();
+  const queryClient = useQueryClient();
   const { balance } = useBalanceStore();
   const { mutate: createTransactionMutation } = useMutation({
     mutationFn: createTransaction,
+    onSuccess: () => {
+      toast.success("Receita criada com sucesso");
+      queryClient.invalidateQueries({ queryKey: ["last-balances"] });
+      setIsOpen(false);
+    },
+    onError: () => {
+      toast.error("Erro ao criar receita");
+      queryClient.invalidateQueries({ queryKey: ["last-balances"] });
+      setIsOpen(false);
+    },
   });
 
   const form = useForm({
