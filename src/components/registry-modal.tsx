@@ -20,9 +20,9 @@ export function RegistryModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="z-50">
+        <Button className="z-50 md:w-fit w-full">
           <PlusIcon />
-          <span className="md:block hidden">Novo Registro</span>
+          Novo Registro
         </Button>
       </DialogTrigger>
       <DialogContent>

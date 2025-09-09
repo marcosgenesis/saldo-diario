@@ -4,9 +4,11 @@ import { PeriodSelector } from "@/components/period-selector";
 import { RegistryModal } from "@/components/registry-modal";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
 import { fromUTC, getUserTimezone } from "@/lib/date-utils";
 import { getTodayBalance } from "@/queries/get-today-balance";
 import { useBalanceStore as useBalanceStoreStore } from "@/stores/balance-store";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/home")({
@@ -32,9 +34,29 @@ export const Route = createFileRoute("/_authenticated/home")({
 });
 
 function RouteComponent() {
-  const { balance } = useBalanceStoreStore();
+  const { balance, setBalance } = useBalanceStoreStore();
+  const { user } = useAuth();
 
-  if (!balance) {
+  const balanceQuery = useQuery({
+    queryKey: ["balance"],
+    queryFn: async () => {
+      const userTimezone = getUserTimezone();
+      const response = await getTodayBalance();
+      if (response) {
+        const balance = {
+          ...response,
+          startDate: fromUTC(response.startDate, userTimezone),
+          endDate: fromUTC(response.endDate, userTimezone),
+          createdAt: fromUTC(response.createdAt, userTimezone),
+        };
+        setBalance(balance);
+      }
+      return response;
+    },
+    enabled: !!user,
+  });
+
+  if (!balance && !balanceQuery.isSuccess) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center py-8">
         <div className="max-w-7xl w-full px-4">
@@ -51,8 +73,8 @@ function RouteComponent() {
       <div className="max-w-7xl w-full px-4">
         <div className="space-y-8">
           <div className="border rounded-lg">
-            <AuroraBackground className="rounded-lg">
-              <div className="flex justify-between items-center w-full sm:px-4 px-2">
+            <AuroraBackground className="rounded-lg py-4">
+              <div className="flex justify-between items-center w-full sm:px-4 px-2 md:flex-row flex-col gap-2">
                 <div className="sm:p-4 p-1 flex flex-col gap-2 items-start justify-between w-full">
                   <span>
                     <p className="text-muted-foreground">Saldo Diário</p>

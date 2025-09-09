@@ -1,5 +1,6 @@
 import { router } from "@/router";
 import { authClient } from "@/services/auth-client";
+import { destroyCookie, parseCookies, setCookie } from "nookies";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface User {
@@ -27,7 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   // Restore auth state on app load
   useEffect(() => {
-    const token = localStorage.getItem("bearer_token");
+    const cookies = parseCookies();
+    const token = cookies["@saldo-diario/token"];
     authClient.getSession().then((session) => {
       console.log(session);
       if (session.data?.session) {
@@ -68,8 +70,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
         onSuccess: (ctx) => {
           const authToken = ctx.response.headers.get("set-auth-token"); // get the token from the response headers
-          // Store the token securely (e.g., in localStorage)
-          localStorage.setItem("bearer_token", authToken as string);
+          // Store the token securely
+          setCookie(null, "@saldo-diario/token", authToken || "", {
+            path: "/",
+            maxAge: 60 * 60 * 24 * 1,
+          });
           setIsAuthenticated(true);
           setUser(ctx.data.user);
           router.navigate({ to: "/home" });
@@ -81,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("bearer_token");
+    destroyCookie(null, "@saldo-diario/token");
     authClient.signOut();
   };
 

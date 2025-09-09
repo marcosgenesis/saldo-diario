@@ -48,6 +48,7 @@
     "ky": "^1.9.1",
     "lucide-react": "^0.476.0",
     "motion": "^12.23.12",
+    "nookies": "^2.5.2",
     "radix-ui": "^1.4.3",
     "react": "^19.0.0",
     "react-day-picker": "^9.9.0",
