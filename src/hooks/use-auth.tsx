@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const authToken = ctx.response.headers.get("set-auth-token");
             setCookie(null, "@saldo-diario/token", authToken || "", {
               path: "/",
-              maxAge: 60 * 60 * 24 * 1,
+              maxAge: 60 * 60 * 24 * 7,
             });
           },
         },
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Store the token securely
           setCookie(null, "@saldo-diario/token", authToken || "", {
             path: "/",
-            maxAge: 60 * 60 * 24 * 1,
+            maxAge: 60 * 60 * 24 * 7,
           });
           setIsAuthenticated(true);
           setUser(ctx.data.user);
