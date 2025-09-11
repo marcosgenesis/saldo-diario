@@ -30,20 +30,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const cookies = parseCookies();
     const token = cookies["@saldo-diario/token"];
-    authClient.getSession().then((session) => {
-      console.log(session);
-      if (session.data?.session) {
-        setUser(session.data.user);
-        setIsAuthenticated(true);
-        setIsLoading(false);
-      } else if (token) {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-      } else {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-      }
-    });
+    authClient
+      .getSession({
+        fetchOptions: {
+          onSuccess: (ctx) => {
+            const authToken = ctx.response.headers.get("set-auth-token");
+            setCookie(null, "@saldo-diario/token", authToken || "", {
+              path: "/",
+              maxAge: 60 * 60 * 24 * 1,
+            });
+          },
+        },
+      })
+      .then((session) => {
+        console.log(session);
+        if (session.data?.session) {
+          setUser(session.data.user);
+          setIsAuthenticated(true);
+          setIsLoading(false);
+        } else if (token) {
+          setIsAuthenticated(false);
+          setIsLoading(false);
+        } else {
+          setIsAuthenticated(false);
+          setIsLoading(false);
+        }
+      });
   }, []);
 
   // Show loading state while checking auth
