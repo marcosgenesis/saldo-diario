@@ -1,5 +1,4 @@
 import ky from "ky";
-import { parseCookies } from "nookies";
 
 export interface SuccessResponse<T = any> {
   success: true;
@@ -12,9 +11,7 @@ export interface SuccessResponse<T = any> {
 // Função para obter o token de forma segura
 function getAuthToken(): string | null {
   try {
-    const cookies = parseCookies();
-    const token = cookies["@saldo-diario/token"];
-
+    const token = localStorage.getItem("@saldo-diario/token");
     if (!token) {
       return null;
     }

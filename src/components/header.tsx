@@ -1,6 +1,5 @@
 import { HouseIcon, InboxIcon } from "lucide-react";
 
-import Logo from "@/components/navbar-components/logo";
 import UserMenu from "@/components/navbar-components/user-menu";
 import {
   NavigationMenu,
@@ -49,7 +48,7 @@ export default function Header() {
         {/* Middle side: Logo */}
         <div className="flex items-center">
           <a href="#" className="text-primary hover:text-primary/90">
-            <Logo />
+            <img src="/logo.svg" alt="Saldo Diário" className="w-10 h-10" />
           </a>
         </div>
 

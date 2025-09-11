@@ -12,7 +12,7 @@ export default defineConfig({
     TanStackRouterVite({ autoCodeSplitting: true }),
     viteReact(),
     tailwindcss(),
-    VitePWA({ registerType: "autoUpdate", devOptions: { enabled: true } }),
+    VitePWA({ registerType: "autoUpdate", devOptions: { enabled: false } }),
   ],
   resolve: {
     alias: {
