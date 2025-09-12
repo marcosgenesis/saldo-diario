@@ -16,7 +16,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => (
     <>
       <Outlet />
-      {!import.meta.env.DEV && (
+      {import.meta.env.DEV && (
         <TanstackDevtools
           config={{
             position: "bottom-left",
