@@ -19,8 +19,8 @@ export function RegistryModal() {
         </Button>
       </Drawer.Trigger>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-        <Drawer.Content className="bg-background flex h-[95%] flex-col rounded-t-[10px] border-t fixed bottom-0 left-0 right-0">
+        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50" />
+        <Drawer.Content className="bg-background flex h-[600px] flex-col rounded-t-[10px] border-t fixed bottom-0 left-0 right-0 z-50">
           <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
 
           <div className="flex-1 overflow-y-auto p-6">

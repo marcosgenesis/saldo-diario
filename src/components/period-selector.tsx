@@ -1,3 +1,4 @@
+import { useDeviceDetection } from "@/hooks/use-device-detection";
 import { fromUTC, getUserTimezone } from "@/lib/date-utils";
 import { useBalanceStore } from "@/stores/balance-store";
 import { usePeriodStore } from "@/stores/period-store";
@@ -11,6 +12,7 @@ import {
 export const PeriodSelector = () => {
   const { balance } = useBalanceStore();
   const { setPeriod, period } = usePeriodStore();
+  const { isMobileOrPWA } = useDeviceDetection();
   const userTimezone = getUserTimezone();
 
   const minDate = balance?.startDate
@@ -20,10 +22,14 @@ export const PeriodSelector = () => {
     ? fromUTC(balance.endDate, userTimezone)
     : undefined;
 
+  // Configurações baseadas no dispositivo
+  const selectionDays = isMobileOrPWA ? 1 : 3;
+  const displayDays = isMobileOrPWA ? 3 : 5;
+
   return (
     <MiniCalendar
-      days={5}
-      selectionDays={3}
+      days={displayDays}
+      selectionDays={selectionDays}
       minDate={minDate}
       maxDate={maxDate}
       defaultValue={
