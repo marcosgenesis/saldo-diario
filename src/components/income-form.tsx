@@ -37,8 +37,10 @@ export function IncomeForm({ type }: IncomeFormProps) {
       queryClient.invalidateQueries({ queryKey: ["daily-balances"] });
       setIsOpen(false);
     },
-    onError: () => {
-      toast.error("Erro ao criar receita");
+    onError: (error) => {
+      toast.error("Erro ao criar receita", {
+        description: error.message,
+      });
       queryClient.invalidateQueries({ queryKey: ["daily-balances"] });
       setIsOpen(false);
     },
