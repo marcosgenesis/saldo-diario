@@ -13,6 +13,7 @@ import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
+import { CurrencyInput } from "./ui/currency-input";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -33,12 +34,12 @@ export function ExpenseForm({ type }: ExpenseFormProps) {
     mutationFn: createTransaction,
     onSuccess: () => {
       toast.success("Transação criada com sucesso");
-      queryClient.invalidateQueries({ queryKey: ["last-balances"] });
+      queryClient.invalidateQueries({ queryKey: ["daily-balances"] });
       setIsOpen(false);
     },
     onError: () => {
       toast.error("Erro ao criar transação");
-      queryClient.invalidateQueries({ queryKey: ["last-balances"] });
+      queryClient.invalidateQueries({ queryKey: ["daily-balances"] });
       setIsOpen(false);
     },
   });
@@ -74,12 +75,11 @@ export function ExpenseForm({ type }: ExpenseFormProps) {
         children={({ state, handleChange }) => (
           <div className="space-y-2">
             <Label htmlFor="amount">Valor da despesa</Label>
-            <Input
+            <CurrencyInput
               id="amount"
-              type="number"
               placeholder="Digite o valor"
               value={state.value}
-              onChange={(e) => handleChange(Number(e.target.value))}
+              onChange={handleChange}
               required
             />
           </div>
