@@ -25,7 +25,7 @@ export default defineConfig({
         name: "Saldo Diário - Controle Financeiro",
         short_name: "Saldo Diário",
         description: "Aplicativo para controle de saldo diário",
-        theme_color: "#3928E2",
+        theme_color: "#FFFFFF",
         background_color: "#ffffff",
         display: "standalone",
         orientation: "portrait",
