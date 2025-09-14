@@ -39,6 +39,6 @@ export const createTransaction = async (
     }
   } catch (error) {
     console.log({ error });
-    throw new Error("Erro ao criar transação");
+    throw error;
   }
 };

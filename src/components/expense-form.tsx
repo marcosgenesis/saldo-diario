@@ -35,6 +35,7 @@ export function ExpenseForm({ type }: ExpenseFormProps) {
     onSuccess: () => {
       toast.success("Transação criada com sucesso");
       queryClient.invalidateQueries({ queryKey: ["daily-balances"] });
+      queryClient.invalidateQueries({ queryKey: ["balance"] });
       setIsOpen(false);
     },
     onError: () => {
