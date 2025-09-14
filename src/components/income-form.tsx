@@ -79,13 +79,7 @@ export function IncomeForm({ type }: IncomeFormProps) {
         children={({ state, handleChange }) => (
           <div className="space-y-2">
             <Label htmlFor="amount">Valor do ganho</Label>
-            <CurrencyInput
-              id="amount"
-              placeholder="Digite o valor"
-              value={state.value}
-              onChange={handleChange}
-              required
-            />
+            <CurrencyInput value={state.value} onChange={handleChange} />
           </div>
         )}
       />
@@ -119,6 +113,7 @@ export function IncomeForm({ type }: IncomeFormProps) {
                     "w-full justify-start text-left font-normal",
                     !state.value && "text-muted-foreground"
                   )}
+                  type="button"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {state.value
@@ -126,7 +121,7 @@ export function IncomeForm({ type }: IncomeFormProps) {
                     : "Selecione uma data"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent>
                 <Calendar
                   mode="single"
                   selected={state.value}

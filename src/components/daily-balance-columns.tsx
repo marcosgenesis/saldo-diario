@@ -10,48 +10,24 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { deleteTransaction } from "@/mutations/delete-transaction";
 import { getDailyBalances } from "@/queries/get-daily-balances";
 import { useBalanceStore } from "@/stores/balance-store";
 import { usePeriodStore } from "@/stores/period-store";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ArrowBigDownIcon, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-
-interface DailyBalance {
-  date: Date;
-  baseBalance: number;
-  previousDayLeftover: number;
-  expenses: {
-    id: string;
-    amount: number;
-    description: string;
-    date: Date;
-  }[];
-  incomes: {
-    id: string;
-    amount: number;
-    description: string;
-    date: Date;
-  }[];
-  totalAvailable: number;
-  remainingBalance: number;
-}
-
-interface DailyBalanceColumnsProps {
-  days: DailyBalance[];
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  onDeleteExpense: (id: string) => void;
-  onDeleteIncome: (id: string) => void;
-}
 
 export function DailyBalanceColumns() {
   const { balance } = useBalanceStore();
   const { period } = usePeriodStore();
+  const queryClient = useQueryClient();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data: dailyBalances } = useQuery({
     queryKey: ["daily-balances", period],
@@ -70,6 +46,30 @@ export function DailyBalanceColumns() {
     enabled: !!period && !!balance,
   });
 
+  const deleteTransactionMutation = useMutation({
+    mutationFn: ({ id, type }: { id: string; type: "income" | "expense" }) =>
+      deleteTransaction(id, type),
+    onMutate: ({ id }) => {
+      setDeletingId(id);
+    },
+    onSuccess: () => {
+      toast.success("Transação excluída com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["daily-balances"] });
+      queryClient.invalidateQueries({ queryKey: ["balance"] });
+    },
+    onError: (error) => {
+      console.error("Erro ao excluir transação:", error);
+      toast.error("Erro ao excluir transação. Tente novamente.");
+    },
+    onSettled: () => {
+      setDeletingId(null);
+    },
+  });
+
+  const handleDeleteTransaction = (id: string, type: "income" | "expense") => {
+    deleteTransactionMutation.mutate({ id, type });
+  };
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -79,8 +79,8 @@ export function DailyBalanceColumns() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {dailyBalances?.map((day) => (
-        <div key={day.id} className="p-4 bg-card rounded-lg border space-y-4">
+      {dailyBalances?.map((day, index) => (
+        <div key={index} className="p-4 bg-card rounded-lg border space-y-4">
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-lg font-semibold">
@@ -143,6 +143,7 @@ export function DailyBalanceColumns() {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 hover:bg-destructive hover:text-destructive-foreground"
+                            disabled={deletingId === income.id}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -156,12 +157,21 @@ export function DailyBalanceColumns() {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => onDeleteIncome(income.id)}
-                              className="bg-destructive hover:bg-destructive/90"
+                            <AlertDialogCancel
+                              disabled={deletingId === income.id}
                             >
-                              Excluir
+                              Cancelar
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() =>
+                                handleDeleteTransaction(income.id, "income")
+                              }
+                              className="bg-destructive hover:bg-destructive/90"
+                              disabled={deletingId === income.id}
+                            >
+                              {deletingId === income.id
+                                ? "Excluindo..."
+                                : "Excluir"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -202,6 +212,7 @@ export function DailyBalanceColumns() {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 hover:bg-destructive hover:text-destructive-foreground"
+                            disabled={deletingId === expense.id}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -215,12 +226,21 @@ export function DailyBalanceColumns() {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => onDeleteExpense(expense.id)}
-                              className="bg-destructive hover:bg-destructive/90"
+                            <AlertDialogCancel
+                              disabled={deletingId === expense.id}
                             >
-                              Excluir
+                              Cancelar
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() =>
+                                handleDeleteTransaction(expense.id, "expense")
+                              }
+                              className="bg-destructive hover:bg-destructive/90"
+                              disabled={deletingId === expense.id}
+                            >
+                              {deletingId === expense.id
+                                ? "Excluindo..."
+                                : "Excluir"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

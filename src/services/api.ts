@@ -29,7 +29,6 @@ export const api = ky.create({
   prefixUrl: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
   },
   hooks: {
@@ -38,6 +37,11 @@ export const api = ky.create({
         const token = getAuthToken();
         if (token) {
           request.headers.set("Authorization", `Bearer ${token}`);
+        }
+
+        // Só adiciona Content-Type para requisições com corpo
+        if (request.method !== "GET" && request.method !== "DELETE") {
+          request.headers.set("Content-Type", "application/json");
         }
       },
     ],
