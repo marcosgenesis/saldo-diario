@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { Toaster } from "sonner";
+import { PWAUpdatePrompt } from "./components/pwa-update-prompt";
 import { AuthProvider, useAuth } from "./hooks/use-auth";
 import * as TanStackQueryProvider from "./integrations/tanstack-query/root-provider.tsx";
 import { router } from "./router";
@@ -21,6 +22,7 @@ function App() {
           <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
             <InnerApp />
             <Toaster />
+            <PWAUpdatePrompt />
           </TanStackQueryProvider.Provider>
         </QueryClientProvider>
       </AuthProvider>
