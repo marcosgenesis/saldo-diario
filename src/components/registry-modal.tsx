@@ -24,9 +24,7 @@ export function RegistryModal() {
           Novo Registro
         </Button>
       </ResponsiveModalTrigger>
-      <ResponsiveModalContent className="bg-background flex h-[600px] flex-col rounded-t-[10px] border-t fixed bottom-0 left-0 right-0 z-50">
-        <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
-
+      <ResponsiveModalContent>
         <div className="flex-1 overflow-y-auto p-6">
           <div className="mb-6 flex flex-col gap-2">
             <div
@@ -84,7 +82,7 @@ export function RegistryModal() {
           </div>
 
           <p className="text-muted-foreground text-center text-xs mt-4">
-            Esses registros podem ser excluídos a qualquer momento.
+            Você pode excluir os registros a qualquer momento.
           </p>
         </div>
       </ResponsiveModalContent>
