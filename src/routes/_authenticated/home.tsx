@@ -13,7 +13,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: RouteComponent,
-  beforeLoad: async () => {
+  loader: async () => {
     const userTimezone = getUserTimezone();
     const response = await getTodayBalance();
     if (response) {
@@ -30,6 +30,17 @@ export const Route = createFileRoute("/_authenticated/home")({
     return {
       initialBalance: response,
     };
+  },
+  errorComponent: ({ error }) => {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center py-8">
+        <div className="max-w-7xl w-full px-4">
+          <div className="max-w-md mx-auto">
+            <InitialForm />
+          </div>
+        </div>
+      </div>
+    );
   },
 });
 
@@ -55,18 +66,6 @@ function RouteComponent() {
     },
     enabled: !!user,
   });
-
-  if (!balance && !balanceQuery.isSuccess) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center py-8">
-        <div className="max-w-7xl w-full px-4">
-          <div className="max-w-md mx-auto">
-            <InitialForm />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center py-8">

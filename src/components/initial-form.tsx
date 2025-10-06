@@ -9,7 +9,7 @@ import { Fragment } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
-import { Input } from "./ui/input";
+import { CurrencyInput } from "./ui/currency-input";
 import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
@@ -20,9 +20,12 @@ export function InitialForm() {
     onSuccess: () => {
       toast.success("Saldo criado com sucesso");
       queryClient.invalidateQueries({ queryKey: ["last-balances"] });
+      queryClient.invalidateQueries({ queryKey: ["balance"] });
+      window.location.reload();
     },
     onError: () => {
       toast.error("Erro ao criar saldo");
+      window.location.reload();
     },
   });
 
@@ -50,13 +53,12 @@ export function InitialForm() {
           name="amount"
           children={({ state, handleChange }) => (
             <Fragment>
-              <Label htmlFor="balance">Quanto sobrou do seu salário?</Label>
-              <Input
-                id="balance"
-                type="number"
+              <Label htmlFor="amount">Quanto sobrou do seu salário?</Label>
+              <CurrencyInput
+                id="amount"
                 placeholder="Digite o valor"
                 value={state.value}
-                onChange={(e) => handleChange(Number(e.target.value))}
+                onChange={handleChange}
                 required
               />
             </Fragment>

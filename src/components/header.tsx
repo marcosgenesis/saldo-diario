@@ -1,3 +1,4 @@
+import { useLocation } from "@tanstack/react-router";
 import { HouseIcon, InboxIcon } from "lucide-react";
 
 import UserMenu from "@/components/navbar-components/user-menu";
@@ -8,14 +9,14 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 
-// Navigation links array
-const navigationLinks = [
-  { href: "#", label: "Home", icon: HouseIcon, active: true },
-  { href: "#", label: "Histórico completo", icon: InboxIcon },
-  // { href: "#", label: "Insights", icon: ZapIcon },
-];
-
 export default function Header() {
+  const location = useLocation();
+
+  const navigationLinks = [
+    { href: "/home", label: "Home", icon: HouseIcon },
+    { href: "/dashboard", label: "Histórico completo", icon: InboxIcon },
+    // { href: "#", label: "Insights", icon: ZapIcon },
+  ];
   return (
     <header className="border-b px-4 md:px-6">
       <div className="flex h-16 items-center justify-between gap-4">
@@ -25,10 +26,11 @@ export default function Header() {
           <NavigationMenuList className="gap-2">
             {navigationLinks.map((link, index) => {
               const Icon = link.icon;
+              const isActive = location.pathname === link.href;
               return (
                 <NavigationMenuItem key={index}>
                   <NavigationMenuLink
-                    active={link.active}
+                    active={isActive}
                     href={link.href}
                     className="text-foreground hover:text-primary flex-row items-center gap-2 py-1.5 font-medium"
                   >

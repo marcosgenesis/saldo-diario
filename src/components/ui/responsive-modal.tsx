@@ -43,7 +43,11 @@ const ResponsiveModal = ({ children, ...props }: RootResponsiveModalProps) => {
   const isDesktop = useMediaQuery(desktop);
   const ResponsiveModal = isDesktop ? Dialog : Drawer;
 
-  return <ResponsiveModal {...props}>{children}</ResponsiveModal>;
+  return (
+    <Drawer {...props}>
+      <Dialog>{children}</Dialog>;
+    </Drawer>
+  );
 };
 
 const ResponsiveModalTrigger = ({
