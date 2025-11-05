@@ -6,7 +6,7 @@ import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { fromUTC, getUserTimezone } from "@/lib/date-utils";
-import { getTodayBalance } from "@/queries/get-today-balance";
+import { getBalanceByDate } from "@/queries/get-balance-by-date";
 import { useBalanceStore as useBalanceStoreStore } from "@/stores/balance-store";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/home")({
   component: RouteComponent,
   loader: async () => {
     const userTimezone = getUserTimezone();
-    const response = await getTodayBalance();
+    const response = await getBalanceByDate();
     if (response) {
       const balance = {
         ...response,
@@ -52,7 +52,7 @@ function RouteComponent() {
     queryKey: ["balance"],
     queryFn: async () => {
       const userTimezone = getUserTimezone();
-      const response = await getTodayBalance();
+      const response = await getBalanceByDate();
       if (response) {
         const balance = {
           ...response,
