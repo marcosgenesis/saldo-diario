@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { createBalance } from "@/mutations/create-balance";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { Fragment } from "react";
@@ -12,6 +12,7 @@ import { Calendar } from "./ui/calendar";
 import { CurrencyInput } from "./ui/currency-input";
 import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { getUserTimezone, startOfDayInTimezone, endOfDayInTimezone } from "@/lib/date-utils";
 
 export function InitialForm() {
   const queryClient = useQueryClient();
@@ -29,11 +30,16 @@ export function InitialForm() {
     },
   });
 
+  const userTimezone = getUserTimezone();
+  const now = new Date();
+  const startOfMonth = startOfDayInTimezone(new Date(now.getFullYear(), now.getMonth(), 1), userTimezone);
+  const endOfMonth = endOfDayInTimezone(new Date(now.getFullYear(), now.getMonth() + 1, 0), userTimezone);
+
   const form = useForm({
     defaultValues: {
       amount: 0,
-      startDate: startOfMonth(new Date()),
-      endDate: endOfMonth(new Date()),
+      startDate: startOfMonth,
+      endDate: endOfMonth,
     },
     onSubmit: ({ value }) => {
       createBalanceMutation(value);
@@ -55,11 +61,8 @@ export function InitialForm() {
             <Fragment>
               <Label htmlFor="amount">Quanto sobrou do seu salário?</Label>
               <CurrencyInput
-                id="amount"
-                placeholder="Digite o valor"
                 value={state.value}
                 onChange={handleChange}
-                required
               />
             </Fragment>
           )}
@@ -91,7 +94,12 @@ export function InitialForm() {
                   <Calendar
                     mode="single"
                     selected={state.value}
-                    onSelect={handleChange}
+                    onSelect={(date) => {
+                      if (date) {
+                        // Normalizar para o início do dia no timezone do usuário
+                        handleChange(startOfDayInTimezone(date, userTimezone));
+                      }
+                    }}
                     locale={ptBR}
                     required
                   />
@@ -126,7 +134,12 @@ export function InitialForm() {
                   <Calendar
                     mode="single"
                     selected={state.value}
-                    onSelect={handleChange}
+                    onSelect={(date) => {
+                      if (date) {
+                        // Normalizar para o fim do dia no timezone do usuário
+                        handleChange(endOfDayInTimezone(date, userTimezone));
+                      }
+                    }}
                     locale={ptBR}
                     required
                   />

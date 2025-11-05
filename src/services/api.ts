@@ -1,4 +1,5 @@
 import ky from "ky";
+import { getUserTimezone } from "@/lib/date-utils";
 
 export interface SuccessResponse<T = any> {
   success: true;
@@ -38,6 +39,10 @@ export const api = ky.create({
         if (token) {
           request.headers.set("Authorization", `Bearer ${token}`);
         }
+
+        // Adicionar timezone do usuário em todas as requisições
+        const userTimezone = getUserTimezone();
+        request.headers.set("x-timezone", userTimezone);
 
         // Só adiciona Content-Type para requisições com corpo
         if (request.method !== "GET" && request.method !== "DELETE") {
